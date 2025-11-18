@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Screen Sharing App</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: white;
+        text-align: center;
+    }
+
+    #startButton {
+        padding: 12px 25px;
+        background: #0a84ff;
+        border: none;
+        color: white;
+        font-size: 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    #startButton:disabled {
+        background: gray;
+        cursor: not-allowed;
+    }
+
+    #video-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 90vh;
+        margin-top: 20px;
+    }
+
+    video {
+        max-width: 100%;
+        max-height: 100%;
+        background: black;
+    }
+</style>
+
+</head>
+<body>
+
+    <button id="startButton">Start Screen Sharing</button>
+
+    <div id="video-container">
+        <video id="screen-sharing-video" autoplay></video>
+    </div>
+
+<script>
+    const startButton = document.getElementById("startButton");
+    const screenSharingVideo = document.getElementById("screen-sharing-video");
+
+    // Check browser support
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        alert("Screen sharing is not supported in this browser.");
+    } else {
+        startButton.addEventListener("click", startScreenSharing);
+    }
+
+    function startScreenSharing() {
+        navigator.mediaDevices
+            .getDisplayMedia({ video: true })
+            .then((stream) => {
+                screenSharingVideo.srcObject = stream;
+                startButton.disabled = true;
+
+                // If user stops sharing
+                stream.getVideoTracks()[0].addEventListener("ended", () => {
+                    startButton.disabled = false;
+                    screenSharingVideo.srcObject = null;
+                });
+            })
+            .catch((error) => {
+                console.error("Error accessing screen sharing:", error);
+            });
+    }
+</script>
+
+</body>
+</html>
